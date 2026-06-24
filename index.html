@@ -13,6 +13,7 @@
             --bg-color: #f8f9fa;
             --card-bg: #ffffff;
             --border-color: #dcdde1;
+            --info-bg: #f1f2f6;
         }
 
         body {
@@ -85,11 +86,24 @@
             box-shadow: 0 0 5px rgba(231, 76, 60, 0.2);
         }
 
+        /* Bloque explicativo dinámico */
+        .info-alcance {
+            background-color: var(--info-bg);
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary-color);
+            font-size: 13.5px;
+            color: #4f5d73;
+            margin-top: 10px;
+            display: none;
+            text-align: justify;
+        }
+
         .checkbox-group {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .checkbox-group input {
@@ -155,7 +169,7 @@
     <div class="form-card">
         <h1>Solicitud de Eliminación de Cuenta y Datos</h1>
         <p class="description">
-            De conformidad con las políticas de privacidad de Google Play, si decides dar de baja tu perfil en <strong>NeuroDrive</strong>, puedes usar este formulario para solicitar la eliminación definitiva de tu cuenta de usuario y de todos los registros asociados en nuestras bases de datos (historiales de turnos, bitácoras y configuraciones de dispositivos).
+            De conformidad con las políticas de privacidad de Google Play, si decides dar de baja tu perfil en <strong>NeuroDrive</strong>, puedes usar este formulario para solicitar la revocación de tus accesos. Ahora puedes elegir si deseas una remoción parcial o total de la información registrada en nuestras bases de datos.
         </p>
 
         <div id="alert-msg" class="alert"></div>
@@ -174,11 +188,21 @@
             <div class="form-group">
                 <label for="tipo-usuario">Tipo de Cuenta / Rol en el Sistema:</label>
                 <select id="tipo-usuario" required>
-                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="" disabled selected>Seleccione su tipo de cuenta</option>
                     <option value="empresa">Administrador / Empresa B2B</option>
                     <option value="chofer">Conductor / Chofer Operativo</option>
                     <option value="familiar">Familiar / Contacto de Emergencia</option>
                 </select>
+            </div>
+
+            <div class="form-group">
+                <label for="alcance-eliminacion">Alcance de la Eliminación de Datos:</label>
+                <select id="alcance-eliminacion" required>
+                    <option value="" disabled selected>Seleccione cuánto desea borrar</option>
+                    <option value="parcial">Eliminación Parcial (Solo cuenta de acceso, conservar historiales anónimos)</option>
+                    <option value="total">Eliminación Total (Borrar cuenta, rutas, alertas e historiales por completo)</option>
+                </select>
+                <div id="texto-explicativo" class="info-alcance"></div>
             </div>
 
             <div class="form-group">
@@ -188,8 +212,8 @@
 
             <div class="form-group checkbox-group">
                 <input type="checkbox" id="confirmacion" required>
-                <label for="confirmacion">
-                    Comprendo que esta acción es irreversible. Al procesar esta solicitud, mi cuenta de acceso será dada de baja y se eliminarán de forma permanente todos mis registros de telemetría e historiales del ecosistema.
+                <label for="confirmacion" id="label-confirmacion">
+                    Comprendo que esta acción es irreversible y acepto los términos de remoción de información seleccionados.
                 </label>
             </div>
 
@@ -204,38 +228,54 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Colocar el año actual en el pie de página de forma automática
+        // Colocar el año actual automáticamente en el pie de página
         document.getElementById("year-actual").textContent = new Date().getFullYear();
 
         const form = document.getElementById("deletion-form");
         const alertMsg = document.getElementById("alert-msg");
+        const selectAlcance = document.getElementById("alcance-eliminacion");
+        const textoExplicativo = document.getElementById("texto-explicativo");
+        const labelConfirmacion = document.getElementById("label-confirmacion");
 
+        // Evento para cambiar el texto informativo dinámicamente según la selección
+        selectAlcance.addEventListener("change", function() {
+            if (selectAlcance.value === "parcial") {
+                textoExplicativo.innerHTML = "<strong>Nota sobre la Eliminación Parcial:</strong> Se cerrará tu cuenta y se eliminarán tus datos de perfil (nombre, teléfono, contraseña). Sin embargo, para no alterar las estadísticas operativas de la empresa, los registros históricos de alertas de fatiga y los turnos se conservarán en la base de datos de manera completamente anónima y desvinculada de tu identidad.";
+                labelConfirmacion.textContent = "Comprendo que se eliminará mi perfil de acceso y que los historiales de telemetría de mis jornadas se conservarán de forma anónima para fines estadísticos.";
+                textoExplicativo.style.display = "block";
+            } else if (selectAlcance.value === "total") {
+                textoExplicativo.innerHTML = "<strong>Nota sobre la Eliminación Total:</strong> Se borrará de forma definitiva y permanente absolutamente toda tu información de nuestros servidores. Esto incluye tus credenciales de acceso, datos personales, vehículos vinculados, bitácoras de asignación de turnos y todo el histórico de logs de alertas de fatiga. No quedará ningún rastro en el sistema.";
+                labelConfirmacion.textContent = "Comprendo que esta acción borrará permanentemente mi cuenta de acceso junto con todas mis alertas, turnos e historiales del sistema NeuroDrive de manera irreversible.";
+                textoExplicativo.style.display = "block";
+            }
+        });
+
+        // Evento de envío del formulario
         form.addEventListener("submit", function(e) {
-            e.preventDefault(); // Evita que la página recargue al enviar
+            e.preventDefault(); 
 
-            // Obtención de los valores del formulario
             const nombre = document.getElementById("nombre").value.trim();
             const correo = document.getElementById("correo").value.trim();
             const tipoUsuario = document.getElementById("tipo-usuario").value;
+            const alcance = selectAlcance.value;
 
-            // Validación básica interna
-            if (nombre === "" || correo === "" || !tipoUsuario) {
+            if (nombre === "" || correo === "" || !tipoUsuario || !alcance) {
                 alertMsg.className = "alert alert-error";
                 alertMsg.textContent = "Por favor, rellene todos los campos obligatorios.";
                 alertMsg.style.display = "block";
                 return;
             }
 
-            // Simulación técnica de envío de datos del formulario
-            // Aquí puedes conectar posteriormente un fetch hacia tu API en Go si deseas automatizarlo
+            // Simulación técnica de la respuesta
             alertMsg.className = "alert alert-success";
-            alertMsg.innerHTML = `<strong>¡Solicitud recibida con éxito!</strong><br>Se ha iniciado el proceso de revocación de credenciales para el correo <em>${correo}</em>. En un plazo máximo de 72 horas hábiles se confirmará la eliminación completa de los datos asociados.`;
+            alertMsg.innerHTML = `<strong>¡Solicitud de eliminación ${alcance} recibida!</strong><br>Se ha iniciado el proceso de revocación de datos para la cuenta <em>${correo}</em> bajo el alcance solicitado. En un plazo máximo de 72 horas hábiles se completará el borrado en los servidores de la plataforma.`;
             alertMsg.style.display = "block";
 
-            // Limpiar los campos del formulario tras un envío exitoso
+            // Limpiar formulario y ocultar el cuadro informativo
             form.reset();
+            textoExplicativo.style.display = "none";
             
-            // Hacer scroll suave hacia arriba para que el usuario vea el mensaje de éxito
+            // Scroll suave hacia el mensaje de éxito
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
