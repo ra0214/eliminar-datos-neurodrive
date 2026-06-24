@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Eliminación de Datos - NeuroDrive</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --danger-color: #e74c3c;
+            --danger-hover: #c0392b;
+            --text-color: #333333;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #dcdde1;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid var(--danger-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .description {
+            text-align: justify;
+            color: #555;
+            font-size: 14.5px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 15px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--danger-color);
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input {
+            margin-top: 4px;
+        }
+
+        .checkbox-group label {
+            font-weight: normal;
+            font-size: 13.5px;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 15px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--danger-hover);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14.5px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-card">
+        <h1>Solicitud de Eliminación de Cuenta y Datos</h1>
+        <p class="description">
+            De conformidad con las políticas de privacidad de Google Play, si decides dar de baja tu perfil en <strong>NeuroDrive</strong>, puedes usar este formulario para solicitar la eliminación definitiva de tu cuenta de usuario y de todos los registros asociados en nuestras bases de datos (historiales de turnos, bitácoras y configuraciones de dispositivos).
+        </p>
+
+        <div id="alert-msg" class="alert"></div>
+
+        <form id="deletion-form">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo o Razón Social:</label>
+                <input type="text" id="nombre" required placeholder="Ej. Juan Pérez o Empresa S.A.">
+            </div>
+
+            <div class="form-group">
+                <label for="correo">Correo Electrónico Registrado en la App:</label>
+                <input type="email" id="correo" required placeholder="Ej. usuario@dominio.com">
+            </div>
+
+            <div class="form-group">
+                <label for="tipo-usuario">Tipo de Cuenta / Rol en el Sistema:</label>
+                <select id="tipo-usuario" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="empresa">Administrador / Empresa B2B</option>
+                    <option value="chofer">Conductor / Chofer Operativo</option>
+                    <option value="familiar">Familiar / Contacto de Emergencia</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="motivo">Motivo de la baja (Opcional):</label>
+                <textarea id="motivo" rows="3" placeholder="Cuéntanos brevemente la razón de tu salida..."></textarea>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="confirmacion" required>
+                <label for="confirmacion">
+                    Comprendo que esta acción es irreversible. Al procesar esta solicitud, mi cuenta de acceso será dada de baja y se eliminarán de forma permanente todos mis registros de telemetría e historiales del ecosistema.
+                </label>
+            </div>
+
+            <button type="submit" class="btn-submit">Enviar Solicitud de Eliminación</button>
+        </form>
+    </div>
+
+    <div class="footer">
+        © <span id="year-actual"></span> NeuroDrive - Equipo InnovaTech. Cumplimiento de Políticas de Datos de Google Play.
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Colocar el año actual en el pie de página de forma automática
+        document.getElementById("year-actual").textContent = new Date().getFullYear();
+
+        const form = document.getElementById("deletion-form");
+        const alertMsg = document.getElementById("alert-msg");
+
+        form.addEventListener("submit", function(e) {
+            e.preventDefault(); // Evita que la página recargue al enviar
+
+            // Obtención de los valores del formulario
+            const nombre = document.getElementById("nombre").value.trim();
+            const correo = document.getElementById("correo").value.trim();
+            const tipoUsuario = document.getElementById("tipo-usuario").value;
+
+            // Validación básica interna
+            if (nombre === "" || correo === "" || !tipoUsuario) {
+                alertMsg.className = "alert alert-error";
+                alertMsg.textContent = "Por favor, rellene todos los campos obligatorios.";
+                alertMsg.style.display = "block";
+                return;
+            }
+
+            // Simulación técnica de envío de datos del formulario
+            // Aquí puedes conectar posteriormente un fetch hacia tu API en Go si deseas automatizarlo
+            alertMsg.className = "alert alert-success";
+            alertMsg.innerHTML = `<strong>¡Solicitud recibida con éxito!</strong><br>Se ha iniciado el proceso de revocación de credenciales para el correo <em>${correo}</em>. En un plazo máximo de 72 horas hábiles se confirmará la eliminación completa de los datos asociados.`;
+            alertMsg.style.display = "block";
+
+            // Limpiar los campos del formulario tras un envío exitoso
+            form.reset();
+            
+            // Hacer scroll suave hacia arriba para que el usuario vea el mensaje de éxito
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+</script>
+
+</body>
+</html>
